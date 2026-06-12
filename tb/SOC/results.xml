@@ -1,0 +1,6 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1781276021" />
+    <testcase name="mem_test" classname="test_SOC" file="/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/tb/SOC/test_SOC.py" lineno="6" time="0.0025441646575927734" sim_time_ns="0.022" ratio_time="8.647239059132227" />
+  </testsuite>
+</testsuites>

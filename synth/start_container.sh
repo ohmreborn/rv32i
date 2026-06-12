@@ -1,0 +1,1 @@
+docker run -it --rm -v ../:/mnt -w /mnt/synth ohm/openxc7:latest bash $1

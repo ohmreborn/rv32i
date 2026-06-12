@@ -1,135 +1,155 @@
-`include "decode.v"
+`include "/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/src/decode.v"
 
 module control_unit (
+    input wire clk,
     input wire [31:0] machine_code,
 
-    output wire [ 5:0] alu_control,
-    output wire [31:0] immdiate,
+    output reg [31:0] immediate,
 
-    output wire [6:0] opcode,
-    output wire [4:0] r1_address,
-    output wire [4:0] r2_address,
-    output wire [4:0] rd_address,
-    output wire [1:0] alu_out_goto,
-    output wire [1:0] register_write_from,
+    output reg [6:0] opcode,
+    output reg [4:0] r1_address,
+    output reg [4:0] r2_address,
+    output reg [4:0] rd_address,
+    output reg [5:0] alu_control,
+    output reg [1:0] alu_out_goto,
+    output reg [1:0] register_write_from,
 
-    output wire write_mem_enable,
-    output wire write_reg_enable,
-    output wire set_pc
+    output reg write_mem_enable,
+    output reg write_reg_enable,
+    output reg set_pc
 );
 
-  wire [2:0] func3;
-  wire [6:0] func7;
-  assign opcode = machine_code[6:0];
-  assign func3 = machine_code[14:12];
-  assign func7 = machine_code[31:25];
-  assign r1_address = machine_code[19:15];
-  assign r2_address = machine_code[24:20];
-  assign rd_address = machine_code[11:7];
-  always_comb begin
-    case (opcode)
-      OPCODE_IMM_ALU: begin
-        alu_control = {{func3, func7[1]}, R1_IMM};
-        alu_out_goto = REGISTER;
-        register_write_from = ALU_OUT;
-        write_mem_enable = 1'b0;
-        write_reg_enable = 1'b1;
+  reg [2:0] func3;
+  reg [6:0] func7;
+  always_ff @(posedge clk) begin
+    opcode <= machine_code[6:0];
+    func3 <= machine_code[14:12];
+    func7 <= machine_code[31:25];
+    r1_address <= (opcode == `OPCODE_LUI) ? 5'b00000 : machine_code[19:15];
+    r2_address <= machine_code[24:20];
+    rd_address <= machine_code[11:7];
+    if (opcode == `OPCODE_IMM_ALU) begin
+        // opcode, func3, func7, r1, rd
+        alu_control <= {{func3, func7[1]}, `R1_IMM};
+        alu_out_goto <= `REGISTER;
+        register_write_from <= `ALU_OUT;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b1;
         set_pc = 1'b0;
-        case (func3)
-          F3_ADDI, F3_SLTI, F3_SLTIU, F3_XORI, F3_ORI, F3_ANDI: begin
-            immediate = {{20{raw_src[24]}}, raw_src[24:13]};
-          end
-          F3_SRLI_SRAI, F3_SLLI: immdiate = {27'b0, raw_src[24:20]};
-          default: immdiate = 'x;
-        endcase
+        if ((func3 == `F3_ADDI) || (func3 == `F3_SLTIU) || (func3 == `F3_XORI) || (func3 == `F3_ORI) || (func3 == `F3_ANDI)) begin
+            immediate <= {{20{machine_code[24]}}, machine_code[24:13]};
+        end
+        if ((func3 == `F3_ADDI) || (func3 == `F3_ADDI)) begin 
+          immediate <= {{27'b0}, machine_code[24:20]};
+        end
       end
 
-      OPCODE_AUIPC: begin
-        alu_control = {{ALU_ADD}, PC_IMM};
-        alu_out_goto = REGISTER;
-        register_write_from = ALU_OUT;
-        write_mem_enable = 1'b0;
-        write_reg_enable = 1'b1;
-        set_pc = 1'b0;
-        immediate = {raw_src[24:5], 12'b0};
+      else if (opcode == `OPCODE_AUIPC) begin
+        // opcode, rd
+        alu_control <= {{`ALU_ADD}, `PC_IMM};
+        alu_out_goto <= `REGISTER;
+        register_write_from <= `ALU_OUT;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b1;
+        set_pc <= 1'b0;
+        immediate <= {machine_code[24:5], 12'b0};
       end
 
-      OPCODE_LUI: begin
-        alu_control = {{func3, func7[1]}, ALU_R0_IMM};
-        alu_out_goto = REGISTER;
-        register_write_from = ALU_OUT;
-        write_mem_enable = 1'b0;
-        write_reg_enable = 1'b1;
-        set_pc = 1'b0;
-        immediate = {raw_src[24:5], 12'b0};
+      else if (opcode == `OPCODE_LUI) begin
+        // opcode, rd
+        // r1 = r0
+        alu_control <= {{`ALU_ADD}, `R1_IMM};
+        alu_out_goto <= `REGISTER;
+        register_write_from <= `ALU_OUT;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b1;
+        set_pc <= 1'b0;
+        immediate <= {machine_code[24:5], 12'b0};
       end
 
-      OPCODE_R_R_INT: begin
-        alu_control = {{func3, func7[1]}, R1_R2};
-        alu_out_goto = REGISTER;
-        register_write_from = ALU_OUT;
-        write_mem_enable = 1'b0;
-        write_reg_enable = 1'b1;
-        set_pc = 1'b0;
-        immediate = 'x;  // not care
+      else if (opcode == `OPCODE_R_R_INT) begin
+        // opcode, func3, func7, r1, r2, rd
+        alu_control <= {{func3, func7[1]}, `R1_R2};
+        alu_out_goto <= `REGISTER;
+        register_write_from <= `ALU_OUT;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b1;
+        set_pc <= 1'b0;
+        immediate <= 'x;  // not care
       end
 
-      OPCODE_STORE: begin
-        alu_control = {ALU_ADD, R1_IMM};
-        alu_out_goto = WRITE_MEMORY_ADDRESS;
-        register_write_from = NOT_WRITE;
-        write_mem_enable = 1'b1;
-        write_reg_enable = 1'b0;
-        set_pc = 1'b0;
-        immediate = {{20{raw_src[24]}}, raw_src[24:18], raw_src[4:0]};
+      else if (opcode == `OPCODE_STORE) begin
+        // opcode, func3, r1, r2
+        alu_control <= {`ALU_ADD, `R1_IMM};
+        alu_out_goto <= `WRITE_MEMORY_ADDRESS;
+        register_write_from <= `NOT_WRITE;
+        write_mem_enable <= 1'b1;
+        write_reg_enable <= 1'b0;
+        set_pc <= 1'b0;
+        immediate <= {{20{machine_code[24]}}, machine_code[24:18], machine_code[4:0]};
       end
 
-      OPCODE_LOAD: begin
-        alu_control = {ALU_ADD, R1_IMM};
-        alu_out_goto = READ_MEMORY_ADDRESS;
-        register_write_from = DATA_MEMORY;
-        write_mem_enable = 1'b0;
-        write_reg_enable = 1'b1;
-        set_pc = 1'b0;
-        immediate = {{20{raw_src[24]}}, raw_src[24:13]};
+      else if (opcode == `OPCODE_LOAD) begin
+        // opcode, func3, r1, rd
+        alu_control <= {`ALU_ADD, `R1_IMM};
+        alu_out_goto <= `READ_MEMORY_ADDRESS;
+        register_write_from <= `DATA_MEMORY;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b1;
+        set_pc <= 1'b0;
+        immediate <= {{20{machine_code[24]}}, machine_code[24:13]};
       end
 
-      OPCODE_BRANCH: begin
-        case (func3)
-          F3_BEQ, F3_BNE: alu_control = {ALU_SUB, R1_R2};
-          F3_BLT, F3_BGE: alu_control = {ALU_SLT, R1_R2};
-          F3_BLTU, F3_BGEU: alu_control = {ALU_SLTU, R1_R2};
-          default: alu_control = {ALU_DEFAULT, R1_R2};
-        endcase
-        alu_out_goto = JUMP;
-        register_write_from = NOT_WRITE;
-        write_mem_enable = 1'b0;
-        write_reg_enable = 1'b0;
-        set_pc = 1'b1;
-        immediate = {{20{raw_src[24]}}, raw_src[0], raw_src[23:18], raw_src[4:1], 1'b0};
+      else if (opcode == `OPCODE_BRANCH) begin
+        // opcode, func3, r1, r2
+        if ((func3 == `F3_BEQ) || (func3 == `F3_BNE)) begin
+          alu_control <= {`ALU_SUB, `R1_R2};
+        end
+        if ((func3 == `F3_BLT) || (func3 == `F3_BGE)) begin
+          alu_control <= {`ALU_SUB, `R1_R2};
+        end
+        if ((func3 == `F3_BLTU) || (func3 == `F3_BGEU)) begin
+          alu_control <= {`ALU_SUB, `R1_R2};
+        end
+        alu_out_goto <= `JUMP;
+        register_write_from <= `NOT_WRITE;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b0;
+        set_pc <= 1'b1;
+        immediate <= {{20{machine_code[24]}}, machine_code[0], machine_code[23:18], machine_code[4:1], 1'b0};
       end
 
-      OPCODE_JAL: begin
-        alu_control = {ALU_ADD, R1_IMM};
-        alu_out_goto = JUMP;
-        register_write_from = PC_PLUS_4;
-        immediate = {{12{raw_src[24]}}, raw_src[12:5], raw_src[13], raw_src[23:14], 1'b0};
+      else if (opcode == `OPCODE_JAL) begin
+        // opcode, func3, rd
+        alu_control <= {`ALU_ADD, `R1_IMM};
+        alu_out_goto <= `JUMP;
+        register_write_from <= `PC_PLUS_4;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b0;
+        set_pc <= 1'b1;
+        immediate <= {{12{machine_code[24]}}, machine_code[12:5], machine_code[13], machine_code[23:14], 1'b0};
       end
 
-      OPCODE_JALR: begin
-        alu_control = {ALU_ADD, R1_IMM};
-        alu_out_goto = JUMP;
-        register_write_from = PC_PLUS_4;
-        immediate = {20'b0, raw_src[11:0]};
+      else if (opcode == `OPCODE_JALR) begin
+        // opcode, func3, r1, rd
+        alu_control <= {`ALU_ADD, `R1_IMM};
+        alu_out_goto <= `JUMP;
+        register_write_from <= `PC_PLUS_4;
+        write_mem_enable <= 1'b0;
+        write_reg_enable <= 1'b1;
+        set_pc <= 1'b1;
+        immediate <= {20'b0, machine_code[11:0]};
       end
 
-      default: begin
-        alu_control = 'x;
-        alu_out_goto = 'x;
-        register_write_from = 'x;
-        immediate = 'x;
+      else begin
+        alu_control <= 5'bxxxx;
+        alu_out_goto <= 2'bxx;
+        register_write_from <= 2'bxx;
+        write_mem_enable <= 1'bx;
+        write_reg_enable <= 1'bx;
+        set_pc <= 1'bx;
+        immediate <= 32'bx;
       end
-    endcase
   end
 
 endmodule

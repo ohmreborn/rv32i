@@ -3,6 +3,7 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 
 VERILOG_SOURCES += $(PWD)/../../src/read.v
+VERILOG_SOURCES += $(PWD)/../../src/decode.v
 WAVES = 1
 
 # use VHDL_SOURCES for VHDL files
