@@ -14,7 +14,3 @@ rm -f ${PART}.bba
 nextpnr-xilinx --chipdb ${CHIPDB}/${PART}.bin --xdc ${CONSTRAIN} --json ${BUILD}/${TOP}.json --fasm ${BUILD}/${TOP}.fasm --debug
 fasm2frames --part ${PART} --db-root ${DB_DIR}/${CHIPFAM} ${BUILD}/${TOP}.fasm > ${BUILD}/${TOP}.frames
 xc7frames2bit --part_file ${DB_DIR}/${CHIPFAM}/${PART}/part.yaml --part_name ${PART} --frm_file ${BUILD}/${TOP}.frames --output_file ${BUILD}/${TOP}.bit
-
-# nextpnr-xilinx --chip ${PART} --xdc ${CONSTRAIN} --json ${TOP}.json --fasm ${TOP}.fasm
-# fasm2frames --part xc7a35tcsg324-1 ${TOP}.fasm > ${TOP}.frames
-# xc7frames2bit --part xc7a35tcsg324-1 ${TOP}.frames ${TOP}.bit

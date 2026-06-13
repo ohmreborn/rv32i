@@ -1,3 +1,3 @@
 
-read_verilog -sv ../src/decode.v ../src/SOC.v ../src/memory.v 
-synth_xilinx -top SOC -family xc7 -json build/SOC.json
+read_verilog ../src/decode.v ../src/SOC.v ../src/memory.v ../src/control_unit.v
+synth_xilinx -top SOC -family xc7 -json build/SOC.json -nolutram
