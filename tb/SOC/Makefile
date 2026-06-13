@@ -6,7 +6,10 @@ TOPLEVEL_LANG ?= verilog
 VERILOG_SOURCES += $(PWD)/../../src/decode.v
 VERILOG_SOURCES += $(PWD)/../../src/control_unit.v
 VERILOG_SOURCES += $(PWD)/../../src/memory.v
+VERILOG_SOURCES += $(PWD)/../../src/cpu.v
 VERILOG_SOURCES += $(PWD)/../../src/SOC.v
+VERILOG_SOURCES += $(PWD)/../../src/register.v
+VERILOG_SOURCES += $(PWD)/../../src/alu.v
 WAVES = 1
 
 # use VHDL_SOURCES for VHDL files

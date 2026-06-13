@@ -78,8 +78,9 @@
 `define DATA_MEMORY  2'b10
 `define PC_PLUS_4  2'b11
 
-`define FETCH 2'b00
-`define WAIT_FETCH 2'b01
-`define DECODE 2'b10
+`define FETCH 3'b000
+`define DECODE 3'b001
+`define EXEC 3'b010
+`define WRITE_BACK 3'b011
 
 `endif

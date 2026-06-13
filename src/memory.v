@@ -28,7 +28,6 @@ module memory #(
             mem_rdata <= 32'b0;
         end
         else begin
-            mem_ready <= 1'b0;  // default: de-assert every cycle
 
             if (mem_valid && !mem_ready) begin  // new request
                 if (mem_wstrb == 4'b0000) begin
@@ -44,6 +43,9 @@ module memory #(
                     if (mem_wstrb[3]) main_memory[word_addr][31:24] <= mem_wdata[31:24];
                     mem_ready <= 1'b1;
                 end
+            end
+            else begin
+                mem_ready <= 1'b0;  // default: de-assert every cycle
             end
         end
     end
