@@ -1,7 +1,7 @@
 module SOC(
     input wire clk,
     input wire reset,
-    output reg [4:0] LED
+    output wire [4:0] LED
 ); 
     reg        mem_valid;
     reg [31:0] mem_addr;
@@ -23,7 +23,7 @@ module SOC(
 
  
     memory #(
-        .MemInit("../firmware/build/opcode.hex"),
+        .MemInit("../firmware/build/load.hex"),
         .MEMSIZE(512)
     ) mem(
         .clk(clk),
@@ -34,7 +34,10 @@ module SOC(
         .mem_wstrb(mem_wstrb),
         .mem_rdata(mem_rdata),
         .mem_ready(mem_ready)
+        
+        // .LED(LED)
     );
+
  
  
  

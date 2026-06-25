@@ -1,11 +1,6 @@
 `ifndef decode
 `define decode
 
-`define FETCH 2'b00
-`define WAIT_FETCH  2'b01
-`define EXEC  2'b10
-`define WAIT_DATA  2'b11
-
 `define OPCODE_IMM_ALU  7'b0010011
 `define OPCODE_LUI      7'b0110111
 `define OPCODE_AUIPC    7'b0010111
@@ -63,24 +58,24 @@
 `define ALU_AND  4'b1110
 `define ALU_R0_IMM  4'b1111
 
+// src1, src2
 `define PC_IMM  2'b00
 `define PC_R2   2'b01
 `define R1_IMM  2'b10
 `define R1_R2   2'b11
 
-`define REGISTER  2'b00
-`define JUMP  2'b01
-`define WRITE_MEMORY_ADDRESS  2'b10
-`define READ_MEMORY_ADDRESS  2'b11
+// is load store
+`define NOT_LOAD_STORE          2'b00
+`define STORE_MEMORY_ADDRESS    2'b01
+`define LOAD_MEMORY_ADDRESS     2'b10
 
-`define NOT_WRITE  2'b00
-`define ALU_OUT  2'b01
-`define DATA_MEMORY  2'b10
-`define PC_PLUS_4  2'b11
+// register write from
+`define ALU_OUT  1'b0
+`define PC_PLUS_4  1'b1
 
 `define FETCH 3'b000
 `define DECODE 3'b001
 `define EXEC 3'b010
-`define WRITE_BACK 3'b011
+`define DATAMEM 3'b011
 
 `endif
