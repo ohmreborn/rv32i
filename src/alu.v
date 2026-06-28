@@ -31,6 +31,6 @@ module alu (
     endcase
   end
 
-  assign branch = (branch_mode == alu_result[0]);
+assign branch = branch_mode & (alu_result == 32'b0);
 
 endmodule

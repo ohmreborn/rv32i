@@ -33,9 +33,9 @@ module SOC(
         .mem_wdata(mem_wdata),
         .mem_wstrb(mem_wstrb),
         .mem_rdata(mem_rdata),
-        .mem_ready(mem_ready)
+        .mem_ready(mem_ready),
         
-        // .LED(LED)
+        .LED(LED)
     );
 
  

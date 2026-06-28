@@ -10,15 +10,16 @@ module memory #(
     input  wire [31:0] mem_wdata,
     input  wire [ 3:0] mem_wstrb,
     output reg  [31:0] mem_rdata,
-    output reg         mem_ready
+    output reg         mem_ready,
 
-    // output wire [4:0] LED
+    output wire [4:0] LED
 );
 
     reg [31:0] main_memory [0:MEMSIZE-1];
     reg [31:0] LEDS_MAPS [0:1];
     // assign LED = LEDS_MAPS[0][4:0];
-    // assign LED = 5'b11101; 
+    assign LED = 5'b11101; 
+
 
     initial begin
         $readmemh(MemInit, main_memory);

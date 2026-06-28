@@ -39,6 +39,10 @@ module control_unit (
                 immediate = {{27{machine_code[24]}}, machine_code[24:20]};
                 alu_control = {func3, func7[1], `R1_IMM};
             end
+            else begin
+                immediate = 32'b0;
+                alu_control = 6'b0;
+            end
 
             register_write_from = `ALU_OUT;
             write_reg_enable = 1'b1;
@@ -132,13 +136,17 @@ module control_unit (
                 alu_control = {`ALU_SUB, `R1_R2};
                 branch_mode = (func3 == `F3_BNE);
             end
-            if ((func3 == `F3_BLT) || (func3 == `F3_BGE)) begin
+            else if ((func3 == `F3_BLT) || (func3 == `F3_BGE)) begin
                 alu_control = {`ALU_SLT, `R1_R2};
                 branch_mode = (func3 == `F3_BLT);
             end
-            if ((func3 == `F3_BLTU) || (func3 == `F3_BGEU)) begin
+            else if ((func3 == `F3_BLTU) || (func3 == `F3_BGEU)) begin
                 alu_control = {`ALU_SLTU, `R1_R2};
                 branch_mode = (func3 == `F3_BLTU);
+            end
+            else  begin
+                alu_control = 6'b0;
+                branch_mode = 0;
             end
             immediate = {{20{machine_code[24]}}, machine_code[0], machine_code[23:18], machine_code[4:1], 1'b0};
 
