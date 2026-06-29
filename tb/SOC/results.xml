@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1782402250" />
-    <testcase name="mem_test" classname="test_SOC" file="/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/tb/SOC/test_SOC.py" lineno="6" time="0.005170345306396484" sim_time_ns="0.13" ratio_time="25.143388361154663" />
+    <property name="random_seed" value="1782739893" />
+    <testcase name="mem_test" classname="test_SOC" file="/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/tb/SOC/test_SOC.py" lineno="6" time="0.00661015510559082" sim_time_ns="0.13" ratio_time="19.66670946798918" />
   </testsuite>
 </testsuites>

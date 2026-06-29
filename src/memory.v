@@ -1,6 +1,6 @@
 module memory #(
     parameter MemInit = "../firmware/build/load.hex",
-    parameter MEMSIZE = 64
+    parameter MEMSIZE = 256 
 ) (
     input  wire        clk,
     input  wire        reset,
@@ -15,10 +15,9 @@ module memory #(
     output wire [4:0] LED
 );
 
-    reg [31:0] main_memory [0:MEMSIZE-1];
-    reg [31:0] LEDS_MAPS [0:1];
-    // assign LED = LEDS_MAPS[0][4:0];
-    assign LED = 5'b11101; 
+    (* ram_style = "registers" *) reg [31:0] main_memory [0:MEMSIZE-1];
+    reg [31:0] LEDS_MAPS;
+    assign LED = LEDS_MAPS[4:0];
 
 
     initial begin
@@ -35,7 +34,7 @@ module memory #(
         else begin
             // De-assert ready by default unless a new transaction completes
             // Fixed memory range check to avoid out-of-bounds indexing
-            if (mem_valid && !mem_ready) begin  
+            if (mem_valid && !mem_ready) begin
                 if (word_addr < MEMSIZE) begin
                     if (mem_wstrb == 4'b0000) begin
                         // READ: return data and assert ready same cycle
@@ -51,18 +50,18 @@ module memory #(
                         mem_ready <= 1'b1;
                     end
                 end
-                else if (word_addr == 32'h400 || word_addr == 32'h401) begin
+                else if (word_addr == 32'h400) begin
                     if (mem_wstrb == 4'b0000) begin
                         // READ
-                        mem_rdata <= LEDS_MAPS[word_addr[0]];
+                        mem_rdata <= LEDS_MAPS;
                         mem_ready <= 1'b1;
                     end
                     else begin
                         // WRITE
-                        if (mem_wstrb[0]) LEDS_MAPS[word_addr[0]][ 7: 0] <= mem_wdata[ 7: 0];
-                        if (mem_wstrb[1]) LEDS_MAPS[word_addr[0]][15: 8] <= mem_wdata[15: 8];
-                        if (mem_wstrb[2]) LEDS_MAPS[word_addr[0]][23:16] <= mem_wdata[23:16];
-                        if (mem_wstrb[3]) LEDS_MAPS[word_addr[0]][31:24] <= mem_wdata[31:24];
+                        if (mem_wstrb[0]) LEDS_MAPS[ 7: 0] <= mem_wdata[ 7: 0];
+                        if (mem_wstrb[1]) LEDS_MAPS[15: 8] <= mem_wdata[15: 8];
+                        if (mem_wstrb[2]) LEDS_MAPS[23:16] <= mem_wdata[23:16];
+                        if (mem_wstrb[3]) LEDS_MAPS[31:24] <= mem_wdata[31:24];
                         mem_ready <= 1'b1;
                     end
                 end

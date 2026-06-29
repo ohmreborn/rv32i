@@ -1,208 +1,101 @@
 module control_unit (
     input wire [31:0] machine_code,
 
-    output reg [31:0] immediate,
-
-    output reg [6:0] opcode,
-    output reg [4:0] r1_address,
-    output reg [4:0] r2_address,
-    output reg [4:0] rd_address,
-    output reg [5:0] alu_control,
-
-    output reg [2:0] mem_address_mode,
-    output reg [1:0] load_or_store,
-
-    output reg register_write_from,
-    output reg write_reg_enable,
-
-    output reg branch_mode,
-    output reg is_branch,
-    output reg is_jump
+    output wire [31:0] immediate,
+    output wire [6:0]  opcode,
+    output wire [4:0]  r1_address,
+    output wire [4:0]  r2_address,
+    output wire [4:0]  rd_address,
+    output wire [5:0]  alu_control,
+    output wire [2:0]  mem_address_mode,
+    output wire [1:0]  load_or_store,
+    output wire        register_write_from,
+    output wire        write_reg_enable,
+    output wire        branch_mode,
+    output wire        is_branch,
+    output wire        is_jump
 );
 
-    reg [2:0] func3;
-    reg [6:0] func7;
-    always @(*) begin
-        opcode = machine_code[6:0];
-        func3 = machine_code[14:12];
-        func7 = machine_code[31:25];
-        r1_address = (opcode == `OPCODE_LUI) ? 5'b00000 : machine_code[19:15];
-        r2_address = machine_code[24:20];
-        rd_address = machine_code[11:7];
-        if (opcode == `OPCODE_IMM_ALU) begin
-            // opcode, func3, func7, r1, rd
-            if ((func3 == `F3_ADDI) || (func3 == `F3_SLTI) || (func3 == `F3_SLTIU) || (func3 == `F3_XORI) || (func3 == `F3_ORI) || (func3 == `F3_ANDI)) begin
-                immediate = {{25{machine_code[31]}}, machine_code[31:20]};
-                alu_control = {func3, 1'b0, `R1_IMM};
-            end
-            else if ((func3 == `F3_SLLI) || (func3 == `F3_SRLI_SRAI)) begin 
-                immediate = {{27{machine_code[24]}}, machine_code[24:20]};
-                alu_control = {func3, func7[1], `R1_IMM};
-            end
-            else begin
-                immediate = 32'b0;
-                alu_control = 6'b0;
-            end
+    wire [6:0] opcode_w   = machine_code[6:0];
+    wire [2:0] func3      = machine_code[14:12];
+    wire [6:0] func7      = machine_code[31:25];
 
-            register_write_from = `ALU_OUT;
-            write_reg_enable = 1'b1;
+    assign opcode     = opcode_w;
+    assign r1_address = (opcode_w == `OPCODE_LUI) ? 5'b0 : machine_code[19:15];
+    assign r2_address = machine_code[24:20];
+    assign rd_address = machine_code[11:7];
 
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
+    // ── immediate ────────────────────────────────────────────────
+    wire [31:0] IShamt = {{27{machine_code[24]}}, machine_code[24:20]};
+    wire [31:0] Iimm={{21{machine_code[31]}}, machine_code[30:20]};
+    wire [31:0] Simm={{21{machine_code[31]}}, machine_code[30:25],  machine_code[11:7]};
+    wire [31:0] Bimm={{20{machine_code[31]}}, machine_code[7],      machine_code[30:25],    machine_code[11:8],  1'b0};
+    wire [31:0] Uimm={    machine_code[31],   machine_code[30:12],  {12{1'b0}}};
+    wire [31:0] Jimm={{12{machine_code[31]}}, machine_code[19:12],  machine_code[20],       machine_code[30:21], 1'b0};
 
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_AUIPC) begin
-            // opcode, rd
-            alu_control = {{`ALU_ADD}, `PC_IMM};
-            immediate = {machine_code[31:12], 12'b0};
+    wire IsIShamttype = opcode_w == `OPCODE_IMM_ALU && (func3 == `F3_SLLI || func3 == `F3_SRLI_SRAI);
+    wire IsItype = (opcode_w == `OPCODE_IMM_ALU) || (opcode_w == `OPCODE_LOAD || opcode_w == `OPCODE_JALR);
+    wire IsStype = (opcode_w == `OPCODE_STORE);
+    wire IsBtype = (opcode_w == `OPCODE_BRANCH);
+    wire IsUtype = (opcode_w == `OPCODE_AUIPC) || (opcode_w == `OPCODE_LUI);
+    wire IsJtype = (opcode_w == `OPCODE_JAL);
+    wire IsRtype = (opcode_w == `OPCODE_R_R_INT);
+    assign immediate = 
+        IsIShamttype
+            ? IShamt
+        : IsItype
+            ? Iimm
+        : IsStype
+            ? Simm
+        : IsBtype
+            ? Bimm
+        : IsUtype
+            ? Uimm
+        : IsJtype
+            ? Jimm
+        : 32'b0;
 
-            register_write_from = `ALU_OUT;
-            write_reg_enable = 1'b1;
+    // ── alu_control ──────────────────────────────────────────────
+    assign alu_control =
+        (opcode_w == `OPCODE_IMM_ALU && (func3 == `F3_SLLI || func3 == `F3_SRLI_SRAI))
+            ? {func3, func7[1], `R1_IMM}
+        : (opcode_w == `OPCODE_IMM_ALU)
+            ? {func3, 1'b0, `R1_IMM}
+        : (opcode_w == `OPCODE_R_R_INT)
+            ? {func3, func7[1], `R1_R2}
+        : (opcode_w == `OPCODE_BRANCH && (func3 == `F3_BEQ || func3 == `F3_BNE))
+            ? {`ALU_SUB, `R1_R2}
+        : (opcode_w == `OPCODE_BRANCH && (func3 == `F3_BLT || func3 == `F3_BGE))
+            ? {`ALU_SLT, `R1_R2}
+        : (opcode_w == `OPCODE_BRANCH)
+            ? {`ALU_SLTU, `R1_R2}
+        : (opcode_w == `OPCODE_AUIPC || opcode_w == `OPCODE_JAL)
+            ? {`ALU_ADD, `PC_IMM}
+        : {`ALU_ADD, `R1_IMM};   // LUI, LOAD, STORE, JALR
 
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
+    // ── branch_mode ──────────────────────────────────────────────
+    assign branch_mode =
+        (opcode_w == `OPCODE_BRANCH && (func3 == `F3_BNE || func3 == `F3_BGE || func3 == `F3_BGEU))
+            ? 1'b1 : 1'b0;
 
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_LUI) begin
-            // opcode, rd
-            // r1 = r0
-            alu_control = {{`ALU_ADD}, `R1_IMM};
-            immediate = {machine_code[31:12], 12'b0};
+    // ── mem / load_or_store ──────────────────────────────────────
+    assign mem_address_mode =
+        (opcode_w == `OPCODE_LOAD || opcode_w == `OPCODE_STORE) ? func3 : 3'b0;
 
-            register_write_from = `ALU_OUT;
-            write_reg_enable = 1'b1;
+    assign load_or_store =
+        (opcode_w == `OPCODE_LOAD)  ? `LOAD_MEMORY_ADDRESS  :
+        (opcode_w == `OPCODE_STORE) ? `STORE_MEMORY_ADDRESS :
+        `NOT_LOAD_STORE;
 
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
+    // ── register write ───────────────────────────────────────────
+    assign write_reg_enable =
+        (opcode_w == `OPCODE_STORE || opcode_w == `OPCODE_BRANCH) ? 1'b0 : 1'b1;
 
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_R_R_INT) begin
-            // opcode, func3, func7, r1, r2, rd
-            alu_control = {{func3, func7[1]}, `R1_R2};
-            immediate = 32'bx;
+    assign register_write_from =
+        (opcode_w == `OPCODE_JAL || opcode_w == `OPCODE_JALR) ? `PC_PLUS_4 : `ALU_OUT;
 
-            register_write_from = `ALU_OUT;
-            write_reg_enable = 1'b1;
-
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
-
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_STORE) begin
-            // opcode, func3, r1, r2
-            alu_control = {`ALU_ADD, `R1_IMM};
-            immediate = {{20{machine_code[31]}}, machine_code[31:25], machine_code[11:7]};
-
-            register_write_from = 1'bx;
-            write_reg_enable = 1'b0;
-
-            mem_address_mode = func3;
-            load_or_store = `STORE_MEMORY_ADDRESS;
-
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_LOAD) begin
-            // opcode, func3, r1, rd
-            alu_control = {`ALU_ADD, `R1_IMM};
-            immediate = {{20{machine_code[31]}}, machine_code[31:20]};
-
-            register_write_from = 1'bx;
-            write_reg_enable = 1'b1;
-
-            mem_address_mode = func3;
-            load_or_store = `LOAD_MEMORY_ADDRESS;
-
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_BRANCH) begin
-            // opcode, func3, r1, r2
-            if ((func3 == `F3_BEQ) || (func3 == `F3_BNE)) begin
-                alu_control = {`ALU_SUB, `R1_R2};
-                branch_mode = (func3 == `F3_BNE);
-            end
-            else if ((func3 == `F3_BLT) || (func3 == `F3_BGE)) begin
-                alu_control = {`ALU_SLT, `R1_R2};
-                branch_mode = (func3 == `F3_BLT);
-            end
-            else if ((func3 == `F3_BLTU) || (func3 == `F3_BGEU)) begin
-                alu_control = {`ALU_SLTU, `R1_R2};
-                branch_mode = (func3 == `F3_BLTU);
-            end
-            else  begin
-                alu_control = 6'b0;
-                branch_mode = 0;
-            end
-            immediate = {{20{machine_code[24]}}, machine_code[0], machine_code[23:18], machine_code[4:1], 1'b0};
-
-            register_write_from = 1'bx;
-            write_reg_enable = 1'b0;
-
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
-
-            is_branch = 1'b1;
-            is_jump = 1'b0;
-        end 
-        else if (opcode == `OPCODE_JAL) begin
-            // opcode, func3, rd
-            alu_control = {`ALU_ADD, `PC_IMM};
-            immediate = {{12{machine_code[31]}}, machine_code[19: 12], machine_code[20], machine_code[30:21], 1'b0};
-
-            register_write_from = `PC_PLUS_4;
-            write_reg_enable = 1'b1;
-
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
-
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b1;
-        end 
-        else if (opcode == `OPCODE_JALR) begin
-            // opcode, func3, r1, rd
-            alu_control = {`ALU_ADD, `R1_IMM};
-            immediate = {{20{machine_code[31]}}, machine_code[11:0]};
-
-            register_write_from = `PC_PLUS_4;
-            write_reg_enable = 1'b1;
-
-            mem_address_mode = 3'bxxx;
-            load_or_store = `NOT_LOAD_STORE;
-
-            branch_mode = 1'bx;
-            is_branch = 1'b0;
-            is_jump = 1'b1;
-        end 
-        else begin
-            alu_control = 5'bx;
-            immediate = 32'bx;
-
-            register_write_from = 1'bx;
-            write_reg_enable = 1'bx;
-
-            mem_address_mode = 3'bxxx;
-            load_or_store = 2'bx;
-
-            branch_mode = 1'bx;
-            is_branch = 1'bx;
-            is_jump = 1'bx;
-        end
-    end
+    // ── jump / branch flags ──────────────────────────────────────
+    assign is_branch = (opcode_w == `OPCODE_BRANCH);
+    assign is_jump   = (opcode_w == `OPCODE_JAL || opcode_w == `OPCODE_JALR);
 
 endmodule

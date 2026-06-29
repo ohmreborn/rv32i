@@ -24,7 +24,7 @@ module SOC(
  
     memory #(
         .MemInit("../firmware/build/load.hex"),
-        .MEMSIZE(512)
+        .MEMSIZE(256)
     ) mem(
         .clk(clk),
         .reset(reset),

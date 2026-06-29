@@ -4,6 +4,7 @@
 
 _start:
 	li   t0, IO_LEDS 
-	li	 t1, 29
+	li	 t1, 3
+_loop:
 	sw	 t1, 0(t0)
-	jal  x0, _start
+	jal  x0, _loop
