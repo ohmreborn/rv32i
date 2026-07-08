@@ -6,5 +6,5 @@ _start:
 	li   t0, IO_LEDS 
 	li	 t1, 3
 _loop:
-	sw	 t1, 0(t0)
+	sb	 t1, 0(t0)
 	jal  x0, _loop

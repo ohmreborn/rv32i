@@ -1,3 +1,3 @@
-read_verilog -sv ../src/decode.v ../src/alu.v ../src/control_unit.v ../src/cpu.v  ../src/memory.v ../src/register.v ../src/SOC.v
+read_verilog -sv ../src/decode.v ../src/peripheral.v ../src/bram.v ../src/alu.v ../src/control_unit.v ../src/cpu.v  ../src/memory.v ../src/register.v ../src/SOC.v
 synth_xilinx -top SOC -family xc7 -json build/SOC.json
 stat

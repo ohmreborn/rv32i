@@ -26,6 +26,7 @@ module SOC (
         .MEMSIZE(4096)
     ) mem (
         .clk(clk),
+        .reset(reset),
         .mem_valid(mem_valid),
         .mem_addr(mem_addr),
         .mem_wdata(mem_wdata),
