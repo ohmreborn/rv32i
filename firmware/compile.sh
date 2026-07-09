@@ -1,5 +1,4 @@
-file=load
-riscv32-unknown-elf-gcc ${file}.c -o build/${file}.elf
-riscv32-unknown-elf-objcopy -O binary build/${file}.elf build/${file}.bin
-riscv32-unknown-elf-objdump -d build/${file}.elf > build/${file}.decode
-hexdump -e '1/4 "%08x\n"' build/${file}.bin > build/${file}.hex 
+file=main
+riscv64-unknown-elf-gcc -T linker.ld -nostdlib -nostartfiles ${file}.c -o build/${file}.elf -Wl,-Map,build/${file}.map
+riscv64-unknown-elf-objdump -d build/${file}.elf > build/${file}.out
+riscv64-unknown-elf-objcopy -O verilog build/${file}.elf build/${file}.hex

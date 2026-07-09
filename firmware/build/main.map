@@ -1,0 +1,38 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+                0x0000000000000000                . = 0x0
+
+.everything     0x0000000000000000       0x10
+ *(.text)
+ .text          0x0000000000000000       0x10 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+                0x0000000000000000                _start
+OUTPUT(build/main.elf elf64-littleriscv)
+
+.data           0x0000000000000010        0x0
+ .data          0x0000000000000010        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+
+.bss            0x0000000000000010        0x0
+ .bss           0x0000000000000010        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+
+.comment        0x0000000000000000       0x19
+ .comment       0x0000000000000000       0x19 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+                                         0x1a (size before relaxing)
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+
+.riscv.attributes
+                0x0000000000000000       0x74
+ .riscv.attributes
+                0x0000000000000000       0x74 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o

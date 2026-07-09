@@ -11,5 +11,5 @@ async def mem_test(dut):
     await RisingEdge(dut.clk)
     dut.reset.value = 0
     for _ in range(4):
-        for i in range(16):
+        for i in range(64):
             await RisingEdge(dut.clk)
