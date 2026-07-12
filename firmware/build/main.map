@@ -4,35 +4,36 @@ There are no discarded input sections
 Memory Configuration
 
 Name             Origin             Length             Attributes
-*default*        0x0000000000000000 0xffffffffffffffff
+BRAM             0x00000000         0x00001000         xrw
+*default*        0x00000000         0xffffffff
 
 Linker script and memory map
 
-LOAD /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
-                0x0000000000000000                . = 0x0
+LOAD /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
+                0x00000000                        . = 0x0
 
-.everything     0x0000000000000000       0x10
+.everything     0x00000000       0x20
  *(.text)
- .text          0x0000000000000000       0x10 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
-                0x0000000000000000                _start
-OUTPUT(build/main.elf elf64-littleriscv)
+ .text          0x00000000       0x20 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
+                0x00000000                _start
+OUTPUT(build/main.elf elf32-littleriscv)
 
-.data           0x0000000000000010        0x0
- .data          0x0000000000000010        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+.data           0x00000020        0x0
+ .data          0x00000020        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
 
-.bss            0x0000000000000010        0x0
- .bss           0x0000000000000010        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+.bss            0x00000020        0x0
+ .bss           0x00000020        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
 
-.comment        0x0000000000000000       0x19
- .comment       0x0000000000000000       0x19 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
-                                         0x1a (size before relaxing)
+.comment        0x00000000       0x19
+ .comment       0x00000000       0x19 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
+                                 0x1a (size before relaxing)
 
 .note.GNU-stack
-                0x0000000000000000        0x0
+                0x00000000        0x0
  .note.GNU-stack
-                0x0000000000000000        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+                0x00000000        0x0 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
 
 .riscv.attributes
-                0x0000000000000000       0x74
+                0x00000000       0x1c
  .riscv.attributes
-                0x0000000000000000       0x74 /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccsGgGgA.o
+                0x00000000       0x1c /var/folders/1g/j7jv7tx52qbd3sz729kvvc6m0000gn/T//ccARHsew.o
