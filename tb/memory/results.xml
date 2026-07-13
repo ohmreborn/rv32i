@@ -1,6 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1771227806" />
-    <testcase name="memory_test" classname="test_memory" file="/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/tb/memory/test_memory.py" lineno="6" time="0.0021920204162597656" sim_time_ns="0.02" ratio_time="9.124002610398087" />
-  </testsuite>
-</testsuites>

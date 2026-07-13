@@ -1,0 +1,64 @@
+
+build/firmware.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .everything:
+
+00000000 <_start>:
+   0:	00001137          	lui	sp,0x1
+   4:	fff10113          	addi	sp,sp,-1 # fff <main+0xff3>
+   8:	0040006f          	j	c <main>
+
+0000000c <main>:
+   c:	ff010113          	addi	sp,sp,-16
+  10:	00112623          	sw	ra,12(sp)
+  14:	00812423          	sw	s0,8(sp)
+  18:	01010413          	addi	s0,sp,16
+  1c:	000017b7          	lui	a5,0x1
+  20:	00078023          	sb	zero,0(a5) # 1000 <main+0xff4>
+  24:	000017b7          	lui	a5,0x1
+  28:	000780a3          	sb	zero,1(a5) # 1001 <main+0xff5>
+  2c:	000017b7          	lui	a5,0x1
+  30:	00100713          	li	a4,1
+  34:	00e78123          	sb	a4,2(a5) # 1002 <main+0xff6>
+  38:	000017b7          	lui	a5,0x1
+  3c:	00100713          	li	a4,1
+  40:	00e781a3          	sb	a4,3(a5) # 1003 <main+0xff7>
+  44:	000017b7          	lui	a5,0x1
+  48:	00100713          	li	a4,1
+  4c:	00e78223          	sb	a4,4(a5) # 1004 <main+0xff8>
+  50:	0000006f          	j	50 <main+0x44>
+  54:	3a434347          	.insn	4, 0x3a434347
+  58:	2820                	.insn	2, 0x2820
+  5a:	33623167          	.insn	4, 0x33623167
+  5e:	3630                	.insn	2, 0x3630
+  60:	3330                	.insn	2, 0x3330
+  62:	6139                	.insn	2, 0x6139
+  64:	2029                	.insn	2, 0x2029
+  66:	3531                	.insn	2, 0x3531
+  68:	312e                	.insn	2, 0x312e
+  6a:	302e                	.insn	2, 0x302e
+  6c:	4100                	.insn	2, 0x4100
+  6e:	0000001b          	.insn	4, 0x001b
+  72:	6972                	.insn	2, 0x6972
+  74:	00766373          	.insn	4, 0x00766373
+  78:	1101                	.insn	2, 0x1101
+  7a:	0000                	.insn	2, 0x0000
+  7c:	0400                	.insn	2, 0x0400
+  7e:	0510                	.insn	2, 0x0510
+  80:	7672                	.insn	2, 0x7672
+  82:	32693233          	.insn	4, 0x32693233
+  86:	3170                	.insn	2, 0x3170
+  88:	0000                	.insn	2, 0x0000
+  8a:	0000                	.insn	2, 0x0000
+  8c:	1941                	.insn	2, 0x1941
+  8e:	0000                	.insn	2, 0x0000
+  90:	7200                	.insn	2, 0x7200
+  92:	7369                	.insn	2, 0x7369
+  94:	01007663          	bgeu	zero,a6,a0 <main+0x94>
+  98:	0000000f          	fence	unknown,unknown
+  9c:	7205                	.insn	2, 0x7205
+  9e:	3376                	.insn	2, 0x3376
+  a0:	6932                	.insn	2, 0x6932
+  a2:	7032                	.insn	2, 0x7032
+  a4:	0031                	.insn	2, 0x0031

@@ -22,7 +22,7 @@ module SOC (
     );
 
     memory #(
-        .MemInit("../../firmware/build/main.hex"),
+        .MemInit("../firmware/build/firmware.hex"),
         .MEMSIZE(4096)
     ) mem (
         .clk(clk),

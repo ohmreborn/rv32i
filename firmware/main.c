@@ -10,7 +10,11 @@ typedef struct
 } LED_Typedef;
 #define IO_LEDS ((volatile LED_Typedef *)(0x1000))
 
-void _start() {
-    IO_LEDS->LED1 = 1;
+void main() {
+    IO_LEDS->LED1 = 0;
+    IO_LEDS->LED2 = 0;
+    IO_LEDS->LED3 = 1;
+    IO_LEDS->LED4 = 1;
+    IO_LEDS->LED5 = 1;
     while(1) ;
 }

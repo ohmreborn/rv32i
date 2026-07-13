@@ -46,7 +46,7 @@ module cpu (
                                 `PC_PLUS_4: rd <= pc+4;
                             endcase
                             if (is_jump || (is_branch && branch)) begin
-                                mem_addr <= alu_result;
+                                mem_addr <= {alu_result[31:2], 2'b00};
                             end
                             else begin
                                 mem_addr <= pc + 4;
@@ -55,9 +55,8 @@ module cpu (
                         `STORE_MEMORY_ADDRESS: begin
                             state <= `DATAMEM;
                             mem_valid <= 1'b1;
-                            mem_addr <= alu_result;
-                            mem_wdata <= rs2;
-                            // mem_wstrb <= 4'b0000;
+                            mem_addr <= {alu_result[31:2], 2'b0};
+                            mem_wdata <= rs2 << {alu_result[1:0],3'b000};
                             case (mem_address_mode)
                              `F3_SB: begin
                                 case (alu_result[1:0])
