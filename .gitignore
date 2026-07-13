@@ -1,3 +1,4 @@
 build/
 myenv/
 chipdb
+__pycache__
