@@ -16,6 +16,9 @@ module bram #(
 );
 
   reg [7:0] mem[0:MEMSIZE-1];
+  wire [31:0] ra = {mem[12'hff8], mem[12'hff9], mem[12'hffa], mem[12'hffb]};
+  wire [31:0] ra1 = {mem[12'hfe8], mem[12'hfe9], mem[12'hfea], mem[12'hfeb]};
+
 
   initial begin
     $readmemh(MemInit, mem);

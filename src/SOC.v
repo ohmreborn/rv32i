@@ -10,9 +10,16 @@ module SOC (
     wire  [31:0] mem_rdata;
     wire        mem_ready;
 
+    reg [4:0] irq;
+    reg       trap;
+
     cpu CPU (
         .clk(clk),
         .reset(reset),
+
+        .irq(irq),
+        .trap(trap),
+
         .mem_valid(mem_valid),
         .mem_addr(mem_addr),
         .mem_wdata(mem_wdata),
@@ -34,7 +41,10 @@ module SOC (
         .mem_rdata(mem_rdata),
         .mem_ready(mem_ready),
 
-        .LED(LED)
+        .LED(LED),
+
+        .irq(irq),
+        .trap(trap)
     );
 
 

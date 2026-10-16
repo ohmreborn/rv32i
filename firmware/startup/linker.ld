@@ -1,11 +1,12 @@
 OUTPUT_ARCH( "riscv" )
-ENTRY(_start)
+ENTRY(Reset_Handler)
 
 MEMORY
 {
     BRAM (xrw)      : ORIGIN = 0x0, LENGTH = 4K
 }
 
+_sp = ORIGIN(BRAM) + LENGTH(BRAM);
 
 SECTIONS
 {
@@ -13,6 +14,9 @@ SECTIONS
   .everything : 
   { 
     *(.text.start) 
+    *(.text.sample) 
+    _begin_isr = .;
+    *(.isr_vector) 
     *(.*) 
     } > BRAM
 }

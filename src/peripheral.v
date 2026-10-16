@@ -22,6 +22,9 @@ module peripheral (
   always @(posedge clk) begin
     if (reset) begin
       mem_ready <= 1'b0;
+      for (integer i=0;i<5;i++) begin
+        mem[i] <= 8'b0;
+      end
     end else if (mem_valid && !mem_ready) begin
       if (mem_we) begin
         mem[address] <= mem_wdata;

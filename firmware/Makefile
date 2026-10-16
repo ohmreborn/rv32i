@@ -1,3 +1,4 @@
+
 CC = riscv64-unknown-elf-gcc
 AS = riscv64-unknown-elf-as
 LD = riscv64-unknown-elf-ld
@@ -5,25 +6,27 @@ COPY = riscv64-unknown-elf-objcopy
 DUMP = riscv64-unknown-elf-objdump
 
 BUILD_DIR = build
-LINKER = startup/linker.ld
 
 # Compiler flags for RV32I
-CFLAGS = -march=rv32i -mabi=ilp32
-ASFLAGS = -march=rv32i -mabi=ilp32
+MARCH = rv32i_zicsr
+CFLAGS = -march=$(MARCH) -mabi=ilp32
+ASFLAGS = -march=$(MARCH) -mabi=ilp32
 LDFLAGS = -m elf32lriscv
 
 # Find source files safely (avoiding 'ls')
-SOURCES_C  = $(wildcard *.c)
-SOURCES_AS = $(wildcard startup/*.s)
+SOURCES = .
+SOURCES_C  = $(wildcard $(SOURCES)/*.c)
+SOURCES_AS = $(wildcard $(SOURCES)/startup/*.s)
+LINKER = $(SOURCES)/startup/linker.ld
 
 # Define generated assembly files from C files
 OBJECTS = $(patsubst %.c, $(BUILD_DIR)/obj/%.o, $(SOURCES_C)) \
-		$(patsubst startup/%.s, $(BUILD_DIR)/obj/%.o, $(SOURCES_AS))
+		$(patsubst %.s, $(BUILD_DIR)/obj/%.o, $(SOURCES_AS))
 
 # Target binary
 TARGET = $(BUILD_DIR)/firmware.elf
-HEX = build/firmware.hex
-DEBUG = build/firmware.dump
+HEX = $(BUILD_DIR)/firmware.hex
+DEBUG = $(BUILD_DIR)/firmware.dump
 
 .PHONY: all clean
 
@@ -40,7 +43,7 @@ $(BUILD_DIR)/obj/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/obj/%.o: startup/%.s
+$(BUILD_DIR)/obj/%.o: %.s
 	@mkdir -p $(@D)
 	$(AS) $(ASFLAGS) $< -o $@
 

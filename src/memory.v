@@ -13,7 +13,10 @@ module memory #(
     output reg  [31:0] mem_rdata,
     output reg         mem_ready,
 
-    output wire [4:0] LED
+    output reg [4:0] LED,
+
+    output reg [4:0] irq,
+    output reg       trap
 );
 
   reg  [ 1:0] state;
@@ -84,7 +87,17 @@ module memory #(
       state     <= 2'b00;
       mem_ready <= 1'b0;
       mem_rdata <= 32'b0;
+      trap <= 0;
     end else begin
+
+        if (LED[0] & ~LED[1]) begin
+            irq <= 5'h03;
+            trap <= 1;
+        end else begin
+            irq <= 5'hx;
+            trap <= 0;
+        end
+
       if (valid) begin
           if (ready) begin
             mem_rdata[state*8+:8] <= Isperipheral ? peripheral_rdata : bram_rdata;

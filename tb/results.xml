@@ -1,6 +1,2 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1783952603" />
-    <testcase name="mem_test" classname="test_SOC" file="/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/tb/test_SOC.py" lineno="6" time="0.04836392402648926" sim_time_ns="1.782" ratio_time="36.84564550684486" />
-  </testsuite>
-</testsuites>
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="cocotb tests"><testsuite name="test_SOC" errors="0" failures="0" skipped="0" tests="1" time="0.027" timestamp="2026-10-16T08:26:07.342921+00:00" hostname="MacBook-ohm-M1.local"><testcase classname="test_SOC" name="mem_test" time="0.027"><properties><property name="cocotb" value="True" /><property name="random_seed" value="1792139167" /><property name="file" value="/Users/krittiwitkampradam/Documents/myrisc-v-101/multi-cycle/tb/test_SOC.py" /><property name="line" value="6" /><property name="sim_time_unit" value="ns" /><property name="sim_time_start" value="0.0" /><property name="sim_time_stop" value="1.802" /><property name="sim_time_duration" value="1.802" /><property name="sim_time_ratio" value="66.4648303519131" /></properties></testcase></testsuite></testsuites>
